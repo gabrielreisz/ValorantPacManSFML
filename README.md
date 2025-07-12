@@ -1,6 +1,6 @@
 # Orb Rush 🕹️
 
-![Gameplay Screenshot](https://imgur.com/a/rbDARDF)
+![Gameplay Screenshot](https://imgur.com/a/orbrush-gameplay-rbDARDF)
 
 **Orb Rush** é um jogo de arcade 2D desenvolvido em **C++** com a biblioteca **SFML**. Inspirado no clássico Pac-Man, este projeto traz uma nova roupagem com uma temática baseada no jogo **Valorant**.
 
