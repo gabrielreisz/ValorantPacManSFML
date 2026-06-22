@@ -39,3 +39,10 @@
 
 # debug information files
 *.dwo
+
+# Build / artefatos do projeto
+/build/
+/OrbRush
+OrbRush
+highscore.txt
+.DS_Store
