@@ -1,80 +1,149 @@
 # Orb Rush 🕹️
 
-![Gameplay Screenshot](https://github.com/gabrielreisz/ValorantPacManSFML/blob/0a9195201132ad0a03e410f66c154a9aa7736f61/Gameplay.png)
+![Gameplay Screenshot](docs/Gameplay.png)
 
-**Orb Rush** é um jogo de arcade 2D desenvolvido em **C++** com a biblioteca **SFML**. Inspirado no clássico Pac-Man, este projeto traz uma nova roupagem com uma temática baseada no jogo **Valorant**.
+**Orb Rush** é um jogo de arcade 2D feito em **C++17** com a biblioteca **SFML**.
+Inspirado no clássico Pac-Man, com uma temática baseada em **Valorant**: você
+controla a agente **Jett**, percorre um labirinto coletando todos os Orbes e
+desviando de quatro robôs inimigos com comportamentos distintos.
 
-O jogador controla a agente Jett, navegando por um labirinto para coletar todos os Orbes enquanto desvia de quatro robôs inimigos com comportamentos distintos.
-
-Este projeto foi desenvolvido como trabalho final para a disciplina de Algoritmos e Estruturas de Dados II do curso de Ciência da Computação.
+Originalmente foi um trabalho final da disciplina de *Algoritmos e Estruturas de
+Dados II*, escrito como um único arquivo procedural (sem classes, por exigência
+da época). Este repositório é a versão **refatorada e modernizada** em uma
+arquitetura orientada a objetos.
 
 ---
 
 ## ✨ Funcionalidades
 
-* **Jogabilidade Clássica:** Uma experiência divertida e desafiadora inspirada no Pac-Man.
-* **Temática de Valorant:** Jogue como a agente Jett em um mapa temático.
-* **Inimigos Inteligentes:** Quatro robôs inimigos com padrões de movimento únicos (dois perseguidores e dois aleatórios), usando o algoritmo de busca BFS (Busca em Largura) para encontrar o jogador.
-* **Movimentação Fluida:** Movimento contínuo e baseado em grade, com um sistema de "intenção de movimento" que torna os controles mais responsivos.
-* **Interface Completa:** Inclui menu principal, tela de game over, tela de vitória e créditos.
-* **Sons e Músicas:** Efeitos sonoros e músicas temáticas para uma imersão completa.
-* **Sprites Animados:** Animações para a personagem principal e para os inimigos.
+* **Jogabilidade clássica** inspirada no Pac-Man, com tema Valorant.
+* **Inimigos com IA:** dois robôs perseguem o jogador usando **BFS (busca em
+  largura)** e dois se movem de forma aleatória.
+* **Movimentação fluida** baseada em grade com sistema de *intenção de
+  movimento*, deixando os controles responsivos.
+* **Power Pellets + modo "caçável":** ao comer um orbe especial (nos quatro
+  cantos), os inimigos ficam vulneráveis por alguns segundos — encoste neles
+  para mandá-los de volta ao ponto inicial e ganhar pontos extras. *(novo)*
+* **Recorde persistente:** a maior pontuação é salva em `highscore.txt`. *(novo)*
+* **Pausa:** tecla `P` ou `Esc` durante a partida. *(novo)*
+* **Teletransporte** pelas cordas nas laterais do mapa.
+* **Interface completa:** menu, créditos, *game over*, vitória e HUD com vidas,
+  pontuação e recorde.
+* **Sprites animados** e trilha sonora temática.
+
+---
+
+## 🗂️ Estrutura do projeto
+
+```
+.
+├── CMakeLists.txt        # build principal (CMake)
+├── Makefile              # build alternativo (g++)
+├── include/              # headers (.hpp)
+│   ├── Config.hpp        # constantes, enums e caminhos de assets
+│   ├── ResourceManager.hpp
+│   ├── Map.hpp / Pathfinding.hpp
+│   ├── Player.hpp / Ghost.hpp
+│   └── Game.hpp
+├── src/                  # implementações (.cpp)
+│   ├── main.cpp          # ponto de entrada
+│   ├── Map.cpp / Pathfinding.cpp
+│   ├── Player.cpp / Ghost.cpp
+│   └── Game.cpp
+├── assets/
+│   ├── images/  (.png/.jpg)
+│   ├── audio/   (.mp3)
+│   └── fonts/   (Valorant_Font.ttf)
+├── docs/                 # screenshots
+└── legacy/               # código original (monolítico), preservado p/ referência
+```
+
+### O que mudou na refatoração
+
+| Antes (monolítico)                              | Depois (OOP)                                    |
+|-------------------------------------------------|-------------------------------------------------|
+| 1 arquivo, `main()` com ~1900 linhas            | módulos separados por responsabilidade          |
+| Estado global espalhado                         | encapsulado em `Game`, `Player`, `Ghost`, `Map` |
+| BFS copiado e colado para cada fantasma         | uma função `pathfinding::nextStep`              |
+| 4 fantasmas com ~70 linhas duplicadas cada      | uma classe `Ghost` parametrizada                |
+| ~30 blocos repetidos de carregamento de textura | `ResourceManager` com cache                     |
+| Números mágicos pelo código                     | centralizados em `Config.hpp`                   |
 
 ---
 
 ## 🚀 Como Compilar e Executar
 
-Para compilar e jogar, você precisa ter a biblioteca **SFML** instalada em seu sistema.
+Você precisa da **SFML (>= 2.5)** instalada.
 
-### **1. Dependências**
+* **Linux (Debian/Ubuntu):** `sudo apt install libsfml-dev cmake g++`
+* **macOS (Homebrew):** `brew install sfml@2 cmake`
+* **Windows:** baixe a SFML em <https://www.sfml-dev.org/download.php>
 
-* **Compilador C++:** g++ ou outro compilador moderno.
-* **Biblioteca SFML (>= 2.5):** Você pode baixá-la no [site oficial da SFML](https://www.sfml-dev.org/download.php).
+> ⚠️ **Assets:** a versão original deste trabalho não versionou todos os
+> recursos. Coloque as imagens, áudios e a fonte dentro de `assets/images`,
+> `assets/audio` e `assets/fonts` respectivamente (veja a lista abaixo).
+>
+> 🛟 **O jogo roda mesmo sem os assets originais.** Se um arquivo faltar, o
+> `ResourceManager` gera um *placeholder* procedural (Jett em ciano, robôs
+> coloridos, pílulas, corredores) e usa uma fonte do sistema. Assets ausentes
+> apenas emitem um aviso no terminal — nada de crash. Basta soltar os arquivos
+> originais nas pastas para ter a arte de volta.
 
-### **2. Arquivos de Recurso (Assets)**
-
-Certifique-se de que todos os arquivos de assets (`.png`, `.jpg`, `.mp3`, `.ttf`) mencionados no código estejam no mesmo diretório do executável. Os arquivos necessários são:
-* **Sprites:** `spritesheet.png`, `spritesheet2.png`, `spritesheet3.png`, `robo*.png`, `heart.png`, `orb.png`, etc.
-* **Texturas do Mapa/UI:** `fundo3.png`, `menu.png`, `copas2.png`, `horizontalcheio.png`, etc.
-* **Áudio:** `menu.mp3`, `inicio.mp3`, `jogo.mp3`, `flawless.mp3`, `victory.mp3`, `defeat.mp3`.
-* **Fonte:** `Valorant_Font.ttf`.
-
-### **3. Compilação**
-
-Abra um terminal na pasta raiz do projeto e execute o seguinte comando para compilar o código:
-
-```bash
-g++ gmvpacman.cpp -o OrbRush -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
-```
-
-### **4. Executando o Jogo**
-
-Após a compilação bem-sucedida, um arquivo executável chamado `OrbRush` (ou `OrbRush.exe` no Windows) será criado. Execute-o pelo terminal:
+### Opção 1 — CMake (recomendado)
 
 ```bash
-./OrbRush
+cmake -B build
+cmake --build build
+./build/OrbRush
 ```
+
+O CMake copia a pasta `assets/` para junto do executável automaticamente.
+
+### Opção 2 — Makefile
+
+```bash
+make run
+```
+
+Execute a partir da raiz do projeto (os caminhos de assets são relativos a ela).
+
 ---
 
 ## 🎮 Como Jogar
 
-* **Objetivo:** Coletar todos os "orbes" brancos espalhados pelo mapa para vencer.
-* **Vidas:** Você começa com 3 vidas. Você perde uma vida se um robô inimigo te tocar.
-* **Teletransporte:** Use as cordas nas laterais do mapa para se teletransportar de um lado para o outro.
+* **Objetivo:** coletar todos os orbes do mapa.
+* **Vidas:** você começa com 3; perde uma ao ser tocado por um robô (exceto no
+  modo caçável).
+* **Power Pellets:** os orbes maiores nos cantos deixam os robôs vulneráveis.
+* **Teletransporte:** use as cordas nas laterais.
 
-### **Controles**
+### Controles
 
-* **Setas Direcionais:** Movimentam a Jett pelo labirinto.
-* **Tecla Enter:** Seleciona as opções nos menus.
+| Tecla            | Ação                          |
+|------------------|-------------------------------|
+| Setas            | Mover a Jett                  |
+| Enter            | Selecionar nos menus          |
+| `P` / `Esc`      | Pausar / retomar              |
+
+---
+
+## 📦 Lista de assets esperados
+
+* **Sprites Jett:** `spritesheet.png`, `spritesheet2.png`, `spritesheet3.png`
+* **Robôs:** `robo{azul,vermelho,amarelo,verde}{1,2,3}.png`
+* **Mapa/UI:** `fundo3.png`, `menu.png`, `copas2.png`, `heart.png`, `orb.png`,
+  `corda.png`, `horizontalcheio.png`, `verticalcheio.png`, `canto1..4.jpg`,
+  `t1..4.jpg`, `cruzamento.jpg`
+* **Áudio:** `menu.mp3`, `inicio.mp3`, `jogo.mp3`, `flawless.mp3`, `victory.mp3`,
+  `defeat.mp3`
+* **Fonte:** `Valorant_Font.ttf`
 
 ---
 
 ## 🧑‍💻 Créditos
 
-Este jogo foi desenvolvido por:
+* **Gabriel Costa Reis**
+* **Marcos Vinicius Mariano Dias**
+* **Victor Alexandre S. Ribeiro**
 
-* **Gabriel Costa Reis** 
-* **Marcos Vinicius Mariano Dias** 
-* **Victor Alexandre S. Ribeiro** 
-
-
+Mapa e mecânicas base do Pac-Man: *Prof. André Gustavo dos Santos*.
